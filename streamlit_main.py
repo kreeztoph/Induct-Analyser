@@ -19,7 +19,12 @@ sheet_name = "Data Monitor"
 @st.cache_data(ttl=300)  # cache for 5 minutes to match auto-refresh
 def load_data_min(sheet):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
+    
+    # Directly access Streamlit secrets and parse them as JSON
+    credentials_dict = st.secrets["gcp"] 
+    
+    # Authenticate using the credentials
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
     client = gspread.authorize(creds)
     sheet = client.open(sheet_name).worksheet(sheet)
     data = sheet.get_all_records()
